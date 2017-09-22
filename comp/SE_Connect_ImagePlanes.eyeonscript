@@ -1,0 +1,57 @@
+-- Connect the selected(!) Loaders to Imageplanes 
+
+myStart = 0
+myOff = 0.1
+myErrors = 0
+toolOffset = 1.5
+
+
+ret = AskUser("Connect selected tools to Imageplanes", {	
+	{"TheOffset", Name = "Z-Offset per Plane", "Text", Lines =1, Default = myOff},
+	--{"Selected", Name = "Affect Selected Tools Only", "Checkbox", Default = 0}
+	})
+
+-- did the user cancel?
+if ret then
+
+-- anything selected?
+if #composition:GetToolList(true) == 0 then
+	print("Nothing selected!")
+	do return end
+end
+
+myOff = tonumber(ret.TheOffset) or myOff
+
+--comp:Lock()
+
+--Create a merge3D first
+myM3d = Merge3D
+myMid = 1
+
+flow = comp.CurrentFrame.FlowView
+
+
+for i, v in ipairs(composition:GetToolList(true)) do
+	id = v:GetAttrs().TOOLS_RegID
+		if id == "Loader" then
+		print(v:GetAttrs().TOOLS_Name)
+		if s_y == nil then
+			s_x, s_y = flow:GetPos(v)
+		end
+		v_x, v_y = flow:GetPos(v)
+		myIpl = ImagePlane3D
+		flow:SetPos(myIpl, v_x + toolOffset, v_y)
+		myIpl.MaterialInput = v
+		myIpl.Transform3DOp.Translate.Z[0] = myStart
+		myStart = myStart - myOff
+		-- connect to Merge
+		myM3d["SceneInput"..myMid] = myIpl
+		myMid = myMid + 1
+	end
+end
+
+flow:SetPos(myM3d, s_x + toolOffset * 2, s_y)
+
+--comp:Unlock()
+
+end
