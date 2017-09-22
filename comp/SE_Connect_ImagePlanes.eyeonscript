@@ -1,5 +1,5 @@
 -- Connect the selected(!) Loaders to Imageplanes 
-
+--
 myStart = 0
 myOff = 0.1
 myErrors = 0
